@@ -1,0 +1,21 @@
+# Generated outputs
+downloads/
+dossier.md
+inventory.md
+inventory.json
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+
+# Anything that smells like a real cache or token by accident
+*token*
+*Cache.db*
+purchases_page*.json
