@@ -34,7 +34,7 @@ def find_container() -> Path:
     for container in containers_root.iterdir():
         if not container.is_dir():
             continue
-        meta = container / "Data/.com.apple.containermanagerd.metadata.plist"
+        meta = container / ".com.apple.containermanagerd.metadata.plist"
         if not meta.exists():
             continue
         try:
@@ -92,8 +92,18 @@ def _api_get(path: str, token: str, params: dict | None = None) -> dict:
     qs = dict(params or {})
     qs["mobile_token"] = token
     url = f"{API_BASE}{path}?{urllib.parse.urlencode(qs)}"
-    with urllib.request.urlopen(url, timeout=60) as r:
-        return json.load(r)
+    try:
+        with urllib.request.urlopen(url, timeout=60) as r:
+            return json.load(r)
+    except urllib.error.HTTPError as e:
+        if e.code == 401:
+            raise RuntimeError(
+                "Gumroad API returned 401 — the cached token is no longer valid. "
+                "This usually means you signed out of the Gumroad app. "
+                "Open the app, sign in again, and load your library page so the "
+                "cache repopulates with a fresh token."
+            ) from e
+        raise
 
 
 def list_purchases(token: str, page_size: int = 24) -> Iterator[dict]:
